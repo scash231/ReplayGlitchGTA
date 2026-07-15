@@ -253,8 +253,8 @@ namespace GTAFirewallToggle
             base.OnLoad(e);
 
             var contextMenu = new System.Windows.Forms.ContextMenuStrip();
-            contextMenu.Items.Add("Exit", null, (s, ev) => System.Windows.Forms.Application.Exit()),
-            contextMenu.Items.Add("Info", null, (s, ev) => ShowInfoPopup)
+            contextMenu.Items.Add("Exit", null, (s, ev) => System.Windows.Forms.Application.Exit());
+            contextMenu.Items.Add("Info", null, (s, ev) => Program.ShowInfoPopup());
 
             _trayIcon = new System.Windows.Forms.NotifyIcon()
             {
