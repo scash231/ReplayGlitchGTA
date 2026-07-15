@@ -56,18 +56,37 @@ namespace GTAFirewallToggle
         [STAThread]
         static void Main(string[] args)
         {
-            try
+            if (args.Length == 0 || args[0] != "--launched")
             {
-                string exePath = Process.GetCurrentProcess().MainModule.FileName;
-                if (exePath != null)
+                try
                 {
-                    string dir = System.IO.Path.GetDirectoryName(exePath);
-                    string randomName = Guid.NewGuid().ToString("N").Substring(0, 8) + ".exe";
-                    string newName = System.IO.Path.Combine(dir, randomName);
-                    System.IO.File.Move(exePath, newName);
+                    string exePath = Process.GetCurrentProcess().MainModule.FileName;
+                    if (exePath != null)
+                    {
+                        string dir = System.IO.Path.GetDirectoryName(exePath);
+                        string randomName = Guid.NewGuid().ToString("N").Substring(0, 8) + ".exe";
+                        string newPath = System.IO.Path.Combine(dir, randomName);
+                        
+                        System.IO.File.Copy(exePath, newPath, true);
+                        
+                        ProcessStartInfo psi = new ProcessStartInfo
+                        {
+                            FileName = newPath,
+                            Arguments = "--launched",
+                            UseShellExecute = true
+                        };
+                        
+                        if (!IsAdministrator())
+                        {
+                            psi.Verb = "runas";
+                        }
+                        
+                        Process.Start(psi);
+                    }
                 }
+                catch { }
+                return; // Exit the original launcher
             }
-            catch { }
 
             if (!IsAdministrator())
             {
