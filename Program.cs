@@ -219,7 +219,8 @@ namespace GTAFirewallToggle
             get
             {
                 var cp = base.CreateParams;
-                cp.ExStyle |= 0x20 | 0x80000 | 0x80; // WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW
+                // WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TOPMOST
+                cp.ExStyle |= 0x20 | 0x80000 | 0x80 | 0x00000008; 
                 return cp;
             }
         }
