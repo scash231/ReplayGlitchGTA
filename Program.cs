@@ -264,5 +264,33 @@ namespace GTAFirewallToggle
             }
             base.WndProc(ref m);
         }
+
+        private System.Windows.Forms.NotifyIcon _trayIcon;
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            var contextMenu = new System.Windows.Forms.ContextMenuStrip();
+            contextMenu.Items.Add("Exit", null, (s, ev) => System.Windows.Forms.Application.Exit());
+
+            _trayIcon = new System.Windows.Forms.NotifyIcon()
+            {
+                Icon = System.Drawing.SystemIcons.Shield,
+                ContextMenuStrip = contextMenu,
+                Text = "GTA Firewall Toggle",
+                Visible = true
+            };
+        }
+
+        protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
+        {
+            if (_trayIcon != null)
+            {
+                _trayIcon.Visible = false;
+                _trayIcon.Dispose();
+            }
+            base.OnFormClosed(e);
+        }
     }
 }
