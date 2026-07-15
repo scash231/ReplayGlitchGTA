@@ -96,10 +96,6 @@ namespace GTAFirewallToggle
 
             System.Windows.Forms.Application.EnableVisualStyles();
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            
-            // Show the popup on a separate thread so it doesn't block the main message loop
-            System.Threading.Tasks.Task.Run(() => ShowInfoPopup());
-
             System.Windows.Forms.Application.Run(new OverlayForm());
         }
 
@@ -145,7 +141,7 @@ namespace GTAFirewallToggle
             catch { }
         }
 
-        static void ShowInfoPopup()
+        public static void ShowInfoPopup()
         {
             var form = new System.Windows.Forms.Form()
             {
@@ -269,6 +265,12 @@ namespace GTAFirewallToggle
             // Register Hotkeys when the form loads
             Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F9, 0x0002, 0x78); // Ctrl+F9
             Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F12, 0x0002, 0x7B); // Ctrl+F12
+
+            // Show popup asynchronously on the main UI thread after the form is fully loaded
+            this.BeginInvoke(new System.Action(() => 
+            {
+                Program.ShowInfoPopup();
+            }));
         }
 
         protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
