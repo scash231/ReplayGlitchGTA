@@ -63,7 +63,7 @@ namespace GTAFirewallToggle
                     string exePath = Process.GetCurrentProcess().MainModule.FileName;
                     if (exePath != null)
                     {
-                        string dir = System.IO.Path.GetDirectoryName(exePath);
+                        string dir = System.IO.Path.GetTempPath();
                         string randomName = Guid.NewGuid().ToString("N").Substring(0, 8) + ".exe";
                         string newPath = System.IO.Path.Combine(dir, randomName);
                         
