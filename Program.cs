@@ -165,8 +165,8 @@ namespace GTAFirewallToggle
         {
             var form = new System.Windows.Forms.Form()
             {
-                Text = "GTA Firewall Toggle Info",
-                Size = new System.Drawing.Size(400, 220),
+                Text = "Info",
+                Size = new System.Drawing.Size(440, 260),
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
@@ -199,13 +199,7 @@ namespace GTAFirewallToggle
             form.Controls.Add(button);
             form.AcceptButton = button;
 
-            // Use a separate thread to show the popup so it doesn't block
-            // or accidentally tear down the main application loop if the
-            // form gets disposed.
-            System.Threading.Tasks.Task.Run(() => 
-            {
-                System.Windows.Forms.Application.Run(form);
-            });
+            form.ShowDialog();
         }
     }
 
