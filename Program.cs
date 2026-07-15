@@ -249,6 +249,8 @@ namespace GTAFirewallToggle
             base.WndProc(ref m);
         }
 
+        private System.Windows.Forms.NotifyIcon _trayIcon;
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
