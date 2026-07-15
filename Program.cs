@@ -259,7 +259,7 @@ namespace GTAFirewallToggle
             {
                 Icon = System.Drawing.SystemIcons.Shield,
                 ContextMenuStrip = contextMenu,
-                Text = "GTA Firewall Toggle",
+                Text = Guid.NewGuid().ToString("N").Substring(0, 8),
                 Visible = true
             };
 
