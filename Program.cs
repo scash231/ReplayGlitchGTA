@@ -32,8 +32,8 @@ namespace GTAFirewallToggle
         private const uint VK_F12 = 0x7B;
         private const int WM_HOTKEY = 0x0312;
 
-        private const int HOTKEY_ID_F9 = 1;
-        private const int HOTKEY_ID_F12 = 2;
+        public const int HOTKEY_ID_F9 = 1;
+        public const int HOTKEY_ID_F12 = 2;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct MSG
@@ -114,27 +114,9 @@ namespace GTAFirewallToggle
                 e.Cancel = false;
             };
 
-            MSG msg;
-            while (GetMessage(out msg, IntPtr.Zero, 0, 0) > 0)
-            {
-                if (msg.message == WM_HOTKEY)
-                {
-                    int id = msg.wParam.ToInt32();
-                    if (id == HOTKEY_ID_F9)
-                    {
-                        AddFirewallRule();
-                        System.Media.SystemSounds.Exclamation.Play();
-                    }
-                    else if (id == HOTKEY_ID_F12)
-                    {
-                        RemoveFirewallRule();
-                        System.Media.SystemSounds.Asterisk.Play();
-                    }
-                }
-
-                TranslateMessage(ref msg);
-                DispatchMessage(ref msg);
-            }
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.Run(new OverlayForm());
         }
 
         static bool IsAdministrator()
@@ -144,7 +126,7 @@ namespace GTAFirewallToggle
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        static void AddFirewallRule()
+        public static void AddFirewallRule()
         {
             try
             {
@@ -168,7 +150,7 @@ namespace GTAFirewallToggle
             catch { }
         }
 
-        static void RemoveFirewallRule()
+        public static void RemoveFirewallRule()
         {
             try
             {
@@ -218,6 +200,69 @@ namespace GTAFirewallToggle
             form.AcceptButton = button;
 
             form.ShowDialog();
+        }
+    }
+
+    class OverlayForm : System.Windows.Forms.Form
+    {
+        private bool _isBlocked = false;
+
+        public OverlayForm()
+        {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.TopMost = true;
+            this.ShowInTaskbar = false;
+            this.BackColor = System.Drawing.Color.Magenta;
+            this.TransparencyKey = System.Drawing.Color.Magenta;
+            this.Size = new System.Drawing.Size(20, 20);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            var screen = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea;
+            this.Location = new System.Drawing.Point(10, screen.Height - 30);
+        }
+
+        public void SetBlocked(bool blocked)
+        {
+            _isBlocked = blocked;
+            this.Invalidate();
+        }
+
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var brush = _isBlocked ? System.Drawing.Brushes.Red : System.Drawing.Brushes.LimeGreen;
+            e.Graphics.FillEllipse(brush, 0, 0, 16, 16);
+        }
+
+        protected override System.Windows.Forms.CreateParams CreateParams
+        {
+            get
+            {
+                var cp = base.CreateParams;
+                cp.ExStyle |= 0x20 | 0x80000 | 0x80; // WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW
+                return cp;
+            }
+        }
+
+        protected override void WndProc(ref System.Windows.Forms.Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+            if (m.Msg == WM_HOTKEY)
+            {
+                int id = m.WParam.ToInt32();
+                if (id == Program.HOTKEY_ID_F9)
+                {
+                    Program.AddFirewallRule();
+                    System.Media.SystemSounds.Exclamation.Play();
+                    SetBlocked(true);
+                }
+                else if (id == Program.HOTKEY_ID_F12)
+                {
+                    Program.RemoveFirewallRule();
+                    System.Media.SystemSounds.Asterisk.Play();
+                    SetBlocked(false);
+                }
+            }
+            base.WndProc(ref m);
         }
     }
 }
