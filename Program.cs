@@ -90,41 +90,23 @@ namespace GTAFirewallToggle
 
             if (!IsAdministrator())
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("This application requires administrator privileges! Please run it as Administrator.");
-                Console.ResetColor();
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
+                System.Windows.Forms.MessageBox.Show("This application requires administrator privileges! Please run it as Administrator.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
             }
 
             ShowInfoPopup();
 
 
-            Console.WriteLine("==============================================");
-            Console.WriteLine("         GTA Firewall Toggle Started          ");
-            Console.WriteLine("==============================================");
-            Console.WriteLine("Press Ctrl + F9  to block IP   (NO SAVING MODE ON)");
-            Console.WriteLine("Press Ctrl + F12 to unblock IP (NO SAVING MODE OFF)");
-            Console.WriteLine("Press Ctrl + C in this console to exit.");
-            Console.WriteLine("==============================================\n");
+            RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F9, MOD_CONTROL, VK_F9);
+            RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F12, MOD_CONTROL, VK_F12);
 
-            if (!RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F9, MOD_CONTROL, VK_F9))
-            {
-                Console.WriteLine("Error registering Ctrl+F9 hotkey.");
-            }
 
-            if (!RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F12, MOD_CONTROL, VK_F12))
-            {
-                Console.WriteLine("Error registering Ctrl+F12 hotkey.");
-            }
 
             AppDomain.CurrentDomain.ProcessExit += (s, e) => 
             {
                 UnregisterHotKey(IntPtr.Zero, HOTKEY_ID_F9);
                 UnregisterHotKey(IntPtr.Zero, HOTKEY_ID_F12);
-                RunNetshCommand("advfirewall firewall delete rule name=\"123456\"");
-                Console.WriteLine("Cleaned up firewall rules on exit.");
+                RemoveFirewallRule();
             };
 
             Console.CancelKeyPress += (s, e) => 
@@ -140,17 +122,13 @@ namespace GTAFirewallToggle
                     int id = msg.wParam.ToInt32();
                     if (id == HOTKEY_ID_F9)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] NO SAVING MODE ON");
-                        Console.ResetColor();
-                        RunNetshCommand("advfirewall firewall add rule name=\"123456\" dir=out action=block remoteip=\"192.81.241.171\"");
+                        AddFirewallRule();
+                        System.Media.SystemSounds.Exclamation.Play();
                     }
                     else if (id == HOTKEY_ID_F12)
                     {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] NO SAVING MODE OFF");
-                        Console.ResetColor();
-                        RunNetshCommand("advfirewall firewall delete rule name=\"123456\"");
+                        RemoveFirewallRule();
+                        System.Media.SystemSounds.Asterisk.Play();
                     }
                 }
 
@@ -166,27 +144,39 @@ namespace GTAFirewallToggle
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        static void RunNetshCommand(string arguments)
+        static void AddFirewallRule()
         {
             try
             {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = "netsh",
-                    Arguments = arguments,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                using (Process p = Process.Start(psi))
-                {
-                    p.WaitForExit();
-                }
+                RemoveFirewallRule(); // Ensure it doesn't exist before adding
+                
+                Type policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+                dynamic fwPolicy2 = Activator.CreateInstance(policyType);
+                
+                Type ruleType = Type.GetTypeFromProgID("HNetCfg.FwRule");
+                dynamic rule = Activator.CreateInstance(ruleType);
+                
+                rule.Name = "123456";
+                rule.Description = "Block GTA Save";
+                rule.Action = 0; // NET_FW_ACTION_BLOCK
+                rule.Direction = 2; // NET_FW_RULE_DIR_OUT
+                rule.Enabled = true;
+                rule.RemoteAddresses = "192.81.241.171";
+                
+                fwPolicy2.Rules.Add(rule);
             }
-            catch (Exception ex)
+            catch { }
+        }
+
+        static void RemoveFirewallRule()
+        {
+            try
             {
-                Console.WriteLine($"Error running netsh: {ex.Message}");
+                Type policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+                dynamic fwPolicy2 = Activator.CreateInstance(policyType);
+                fwPolicy2.Rules.Remove("123456");
             }
+            catch { }
         }
 
         static void ShowInfoPopup()
@@ -204,7 +194,7 @@ namespace GTAFirewallToggle
 
             var label = new System.Windows.Forms.Label()
             {
-                Text = "How it works:\n\n1. Press Ctrl + F9 to block the IP (NO SAVING MODE ON).\n2. Press Ctrl + F12 to unblock the IP (NO SAVING MODE OFF).\n3. Keep the console window open to keep the hotkeys active.",
+                Text = "How it works:\n\n1. Press Ctrl + F9 to block the IP (NO SAVING MODE ON).\n2. Press Ctrl + F12 to unblock the IP (NO SAVING MODE OFF).\n3. Keep the program running in the background to use hotkeys.",
                 Dock = System.Windows.Forms.DockStyle.Top,
                 Height = 110,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
