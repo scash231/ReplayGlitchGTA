@@ -152,7 +152,7 @@ namespace GTAFirewallToggle
                 MaximizeBox = false,
                 MinimizeBox = false,
                 TopMost = true,
-                ShowInTask = false
+                ShowInTaskbar = false
             };
 
             var label = new System.Windows.Forms.Label()
