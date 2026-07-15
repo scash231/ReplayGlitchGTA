@@ -186,7 +186,15 @@ namespace GTAFirewallToggle
 
     class OverlayForm : System.Windows.Forms.Form
     {
+        [DllImport("user32.dll")]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        const uint SWP_NOSIZE = 0x0001;
+        const uint SWP_NOMOVE = 0x0002;
+        const uint SWP_NOACTIVATE = 0x0010;
+
         private bool _isBlocked = false;
+        private System.Windows.Forms.Timer _topMostTimer;
 
         public OverlayForm()
         {
@@ -265,6 +273,14 @@ namespace GTAFirewallToggle
                 Visible = true
             };
 
+            _topMostTimer = new System.Windows.Forms.Timer();
+            _topMostTimer.Interval = 5000;
+            _topMostTimer.Tick += (senderTimer, eventArgs) => 
+            {
+                SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            };
+            _topMostTimer.Start();
+
             // Register Hotkeys when the form loads
             Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F9, 0x0002, 0x78); // Ctrl+F9
             Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F12, 0x0002, 0x7B); // Ctrl+F12
@@ -282,6 +298,12 @@ namespace GTAFirewallToggle
             {
                 _trayIcon.Visible = false;
                 _trayIcon.Dispose();
+            }
+
+            if (_topMostTimer != null)
+            {
+                _topMostTimer.Stop();
+                _topMostTimer.Dispose();
             }
 
             // Cleanup Hotkeys and Firewall
