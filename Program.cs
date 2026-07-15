@@ -8,10 +8,10 @@ namespace GTAFirewallToggle
     class Program
     {
         [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+        public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
         [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         [DllImport("user32.dll")]
         private static extern int GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
@@ -94,28 +94,12 @@ namespace GTAFirewallToggle
                 return;
             }
 
-            ShowInfoPopup();
-
-
-            RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F9, MOD_CONTROL, VK_F9);
-            RegisterHotKey(IntPtr.Zero, HOTKEY_ID_F12, MOD_CONTROL, VK_F12);
-
-
-
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => 
-            {
-                UnregisterHotKey(IntPtr.Zero, HOTKEY_ID_F9);
-                UnregisterHotKey(IntPtr.Zero, HOTKEY_ID_F12);
-                RemoveFirewallRule();
-            };
-
-            Console.CancelKeyPress += (s, e) => 
-            {
-                e.Cancel = false;
-            };
-
             System.Windows.Forms.Application.EnableVisualStyles();
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            
+            // Show the popup on a separate thread so it doesn't block the main message loop
+            System.Threading.Tasks.Task.Run(() => ShowInfoPopup());
+
             System.Windows.Forms.Application.Run(new OverlayForm());
         }
 
@@ -265,8 +249,6 @@ namespace GTAFirewallToggle
             base.WndProc(ref m);
         }
 
-        private System.Windows.Forms.NotifyIcon _trayIcon;
-
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -281,6 +263,10 @@ namespace GTAFirewallToggle
                 Text = "GTA Firewall Toggle",
                 Visible = true
             };
+
+            // Register Hotkeys when the form loads
+            Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F9, 0x0002, 0x78); // Ctrl+F9
+            Program.RegisterHotKey(this.Handle, Program.HOTKEY_ID_F12, 0x0002, 0x7B); // Ctrl+F12
         }
 
         protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e)
@@ -290,6 +276,12 @@ namespace GTAFirewallToggle
                 _trayIcon.Visible = false;
                 _trayIcon.Dispose();
             }
+
+            // Cleanup Hotkeys and Firewall
+            Program.UnregisterHotKey(this.Handle, Program.HOTKEY_ID_F9);
+            Program.UnregisterHotKey(this.Handle, Program.HOTKEY_ID_F12);
+            Program.RemoveFirewallRule();
+
             base.OnFormClosed(e);
         }
     }
