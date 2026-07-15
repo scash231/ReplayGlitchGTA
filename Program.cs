@@ -199,7 +199,13 @@ namespace GTAFirewallToggle
             form.Controls.Add(button);
             form.AcceptButton = button;
 
-            form.ShowDialog();
+            // Use a separate thread to show the popup so it doesn't block
+            // or accidentally tear down the main application loop if the
+            // form gets disposed.
+            System.Threading.Tasks.Task.Run(() => 
+            {
+                System.Windows.Forms.Application.Run(form);
+            });
         }
     }
 
