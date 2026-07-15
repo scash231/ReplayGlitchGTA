@@ -151,7 +151,8 @@ namespace GTAFirewallToggle
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
                 MinimizeBox = false,
-                TopMost = true
+                TopMost = true,
+                ShowInTask = false
             };
 
             var label = new System.Windows.Forms.Label()
@@ -168,8 +169,8 @@ namespace GTAFirewallToggle
             {
                 Text = "yalla",
                 DialogResult = System.Windows.Forms.DialogResult.OK,
-                Width = 100,
-                Height = 35,
+                Width = 115,
+                Height = 45,
                 Top = 125,
                 Left = 140,
                 Font = new System.Drawing.Font("Segoe UI", 10f, System.Drawing.FontStyle.Bold)
