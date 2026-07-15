@@ -157,7 +157,7 @@ namespace GTAFirewallToggle
 
             var label = new System.Windows.Forms.Label()
             {
-                Text = "How it works:\n\n1. Press Ctrl + F9 to block the IP (NO SAVING MODE ON).\n2. Press Ctrl + F12 to unblock the IP (NO SAVING MODE OFF).\n3. Keep the program running in the background to use hotkeys.",
+                Text = "How it works:\n\n1. Press Ctrl + F9 to block the IP (Red DOT).\n2. Press Ctrl + F12 to unblock the IP (Green DOT).\n3. Keep the program running in the background to use hotkeys.",
                 Dock = System.Windows.Forms.DockStyle.Top,
                 Height = 110,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
