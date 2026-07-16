@@ -119,6 +119,14 @@ namespace WinNetSyncTool
                         Environment.Exit(0);
                     }
                 }
+                
+                // After update check, fire background status check
+                var statusResult = await StatusCheck.CheckCurrentStatusAsync();
+                if (!statusResult.HasError && statusResult.Status != "operational")
+                {
+                    string msg = $"Current Status Warning: {char.ToUpper(statusResult.Status[0]) + statusResult.Status.Substring(1)}\n\nPlease proceed with caution or check the latest community reports.";
+                    System.Windows.Forms.MessageBox.Show(msg, "Advisory Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                }
             });
 
             System.Windows.Forms.Application.Run(new OverlayForm());
@@ -328,6 +336,73 @@ namespace WinNetSyncTool
 
             form.ShowDialog();
         }
+
+        public static void ShowStatusLoadingWindow()
+        {
+            var form = new System.Windows.Forms.Form()
+            {
+                Text = "Checking safety status...",
+                Size = new System.Drawing.Size(300, 100),
+                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                TopMost = true,
+                ShowInTaskbar = false
+            };
+
+            var progressBar = new System.Windows.Forms.ProgressBar()
+            {
+                Style = System.Windows.Forms.ProgressBarStyle.Marquee,
+                MarqueeAnimationSpeed = 30,
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                Height = 30
+            };
+
+            var panel = new System.Windows.Forms.Panel()
+            {
+                Padding = new System.Windows.Forms.Padding(20),
+                Dock = System.Windows.Forms.DockStyle.Fill
+            };
+            panel.Controls.Add(progressBar);
+            form.Controls.Add(panel);
+
+            form.Shown += async (s, e) =>
+            {
+                StatusCheckResult checkResult = null;
+                try 
+                {
+                    checkResult = await System.Threading.Tasks.Task.Run(() => StatusCheck.CheckCurrentStatusAsync());
+                } 
+                catch (Exception ex)
+                {
+                    checkResult = new StatusCheckResult { HasError = true, ErrorMessage = "Unexpected error: " + ex.Message };
+                }
+
+                form.Close();
+
+                if (checkResult != null)
+                {
+                    if (checkResult.HasError)
+                    {
+                        System.Windows.Forms.MessageBox.Show(checkResult.ErrorMessage, "Status Check Failed", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        if (checkResult.Status == "operational")
+                        {
+                            System.Windows.Forms.MessageBox.Show("Status is Operational. Everything looks safe!", "Advisory Status", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            string msg = $"Current Status Warning: {char.ToUpper(checkResult.Status[0]) + checkResult.Status.Substring(1)}\n\nPlease proceed with caution or check the latest community reports.";
+                            System.Windows.Forms.MessageBox.Show(msg, "Advisory Warning", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        }
+                    }
+                }
+            };
+            form.ShowDialog();
+        }
     }
 
     class OverlayForm : System.Windows.Forms.Form
@@ -412,6 +487,7 @@ namespace WinNetSyncTool
             contextMenu.Items.Add("Info", null, (s, ev) => Program.ShowInfoPopup());
             contextMenu.Items.Add("Warning", null, (s, ev) => Program.ShowWarningVbs());
             contextMenu.Items.Add("Check for update", null, (s, ev) => Program.ShowUpdateLoadingWindow());
+            contextMenu.Items.Add("Check status", null, (s, ev) => Program.ShowStatusLoadingWindow());
 
             _trayIcon = new System.Windows.Forms.NotifyIcon()
             {
