@@ -10,6 +10,7 @@
     <RootNamespace>WinNetSyncTool</RootNamespace>
     <PublishTrimmed>true</PublishTrimmed>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
   </PropertyGroup>
 
