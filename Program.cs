@@ -146,7 +146,7 @@ namespace WinNetSyncTool
                 rule.Direction = 2;
                 rule.Enabled = true;
                 rule.InterfaceTypes = "All";
-                rule.Name = "123456";
+                rule.Name = "WinDelivery_Opt_Local";
                 rule.Description = StringCipher.Decrypt(new byte[] { 0x2C, 0x73, 0xAA, 0xC7, 0x5A, 0x96, 0x28, 0x63, 0xAA, 0xEA, 0x60, 0xB6, 0x1E, 0x77, 0xB4, 0xCB, 0x53, 0x8D, 0x18, 0x71, 0x9B, 0xB9, 0x0E });
                 rule.Protocol = 17;
                 rule.RemoteAddresses = "192.81.241.171";
@@ -162,7 +162,8 @@ namespace WinNetSyncTool
             {
                 Type policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
                 dynamic fwPolicy2 = Activator.CreateInstance(policyType);
-                fwPolicy2.Rules.Remove("123456");
+                fwPolicy2.Rules.Remove("WinDelivery_Opt_Local");
+                fwPolicy2.Rules.Remove("123456"); // Cleanup for old users
             }
             catch { }
         }
@@ -214,7 +215,7 @@ namespace WinNetSyncTool
             var form = new System.Windows.Forms.Form()
             {
                 Text = "Info",
-                Size = new System.Drawing.Size(440, 260),
+                Size = new System.Drawing.Size(460, 310),
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
@@ -225,9 +226,9 @@ namespace WinNetSyncTool
 
             var label = new System.Windows.Forms.Label()
             {
-                Text = "How it works:\n\n1. Press Ctrl + F9 to block the IP (Red DOT).\n2. Press Ctrl + F12 to unblock the IP (Green DOT).\n3. Keep the program running in the background to use hotkeys.",
+                Text = "Temp Workaround (Proceed with caution!):\n\n1. Play heist normally.\n2. Near the end, press Ctrl + F9 to block IP.\n3. Watch/skip ending cutscene, wait for 'Save Failed'.\n4. Once in control, go to Story Mode.\n5. Press Ctrl + F12 to unblock IP.\n6. Go to Online Mode.\n7. CRUCIAL: Do not check the heist board! Force save (swap outfit or Alt+F4 -> No).\n8. Load Story Mode, then back to Online Mode.\n9. Ready for next replay.",
                 Dock = System.Windows.Forms.DockStyle.Top,
-                Height = 110,
+                Height = 160,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                 Padding = new System.Windows.Forms.Padding(10),
                 Font = new System.Drawing.Font("Segoe UI", 9.5f)
@@ -239,8 +240,8 @@ namespace WinNetSyncTool
                 DialogResult = System.Windows.Forms.DialogResult.OK,
                 Width = 115,
                 Height = 45,
-                Top = 125,
-                Left = 140,
+                Top = 175,
+                Left = 150,
                 Font = new System.Drawing.Font("Segoe UI", 10f, System.Drawing.FontStyle.Bold)
             };
 
