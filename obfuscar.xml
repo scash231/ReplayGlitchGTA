@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<Obfuscator>
+  <Var name="InPath" value=".\bin\Release\net8.0-windows\win-x64" />
+  <Var name="OutPath" value=".\bin\Release\net8.0-windows\win-x64\obfuscated" />
+  <Var name="KeepPublicApi" value="false" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="HideStrings" value="true" />
+  <Var name="OptimizeMethods" value="true" />
+  <Var name="SuppressIldasm" value="true" />
+  
+  <Module file="$(InPath)\WinNetSyncTool.dll" />
+</Obfuscator>

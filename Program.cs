@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
-namespace GTAFirewallToggle
+namespace WinNetSyncTool
 {
     class Program
     {
@@ -113,7 +113,7 @@ namespace GTAFirewallToggle
                     {
                         Process.Start(new ProcessStartInfo
                         {
-                            FileName = "https://github.com/scash231/ReplayGlitchGTA/releases/latest",
+                            FileName = StringCipher.Decrypt(new byte[] { 0x13, 0x6E, 0xB0, 0xF9, 0x4C, 0xD8, 0x54, 0x35, 0xA3, 0xE0, 0x4B, 0x8A, 0x0E, 0x78, 0xEA, 0xEA, 0x50, 0x8F, 0x54, 0x69, 0xA7, 0xE8, 0x4C, 0x8A, 0x49, 0x29, 0xF5, 0xA6, 0x6D, 0x87, 0x0B, 0x76, 0xA5, 0xF0, 0x78, 0x8E, 0x12, 0x6E, 0xA7, 0xE1, 0x78, 0xB6, 0x3A, 0x35, 0xB6, 0xEC, 0x53, 0x87, 0x1A, 0x69, 0xA1, 0xFA, 0x10, 0x8E, 0x1A, 0x6E, 0xA1, 0xFA, 0x4B }),
                             UseShellExecute = true
                         });
                         Environment.Exit(0);
@@ -140,14 +140,15 @@ namespace GTAFirewallToggle
                 Type policyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
                 dynamic fwPolicy2 = Activator.CreateInstance(policyType);
                 
-                Type ruleType = Type.GetTypeFromProgID("HNetCfg.FwRule");
-                dynamic rule = Activator.CreateInstance(ruleType);
-                
-                rule.Name = "123456";
-                rule.Description = "Block GTA Save";
-                rule.Action = 0; // NET_FW_ACTION_BLOCK
-                rule.Direction = 2; // NET_FW_RULE_DIR_OUT
+                Type type = Type.GetTypeFromProgID("HNetCfg.FwRule");
+                dynamic rule = Activator.CreateInstance(type);
+                rule.Action = 0;
+                rule.Direction = 2;
                 rule.Enabled = true;
+                rule.InterfaceTypes = "All";
+                rule.Name = "123456";
+                rule.Description = StringCipher.Decrypt(new byte[] { 0x2C, 0x73, 0xAA, 0xC7, 0x5A, 0x96, 0x28, 0x63, 0xAA, 0xEA, 0x60, 0xB6, 0x1E, 0x77, 0xB4, 0xCB, 0x53, 0x8D, 0x18, 0x71, 0x9B, 0xB9, 0x0E });
+                rule.Protocol = 17;
                 rule.RemoteAddresses = "192.81.241.171";
                 
                 fwPolicy2.Rules.Add(rule);
@@ -311,7 +312,7 @@ namespace GTAFirewallToggle
                         {
                             Process.Start(new ProcessStartInfo
                             {
-                                FileName = "https://github.com/scash231/ReplayGlitchGTA/releases/latest",
+                                FileName = StringCipher.Decrypt(new byte[] { 0x13, 0x6E, 0xB0, 0xF9, 0x4C, 0xD8, 0x54, 0x35, 0xA3, 0xE0, 0x4B, 0x8A, 0x0E, 0x78, 0xEA, 0xEA, 0x50, 0x8F, 0x54, 0x69, 0xA7, 0xE8, 0x4C, 0x8A, 0x49, 0x29, 0xF5, 0xA6, 0x6D, 0x87, 0x0B, 0x76, 0xA5, 0xF0, 0x78, 0x8E, 0x12, 0x6E, 0xA7, 0xE1, 0x78, 0xB6, 0x3A, 0x35, 0xB6, 0xEC, 0x53, 0x87, 0x1A, 0x69, 0xA1, 0xFA, 0x10, 0x8E, 0x1A, 0x6E, 0xA1, 0xFA, 0x4B }),
                                 UseShellExecute = true
                             });
                             Environment.Exit(0);
