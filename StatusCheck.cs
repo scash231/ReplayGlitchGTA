@@ -70,7 +70,7 @@ namespace WinNetSyncTool
                         {
                             string bodyText = bodyElement.GetString() ?? "";
 
-                            var match = Regex.Match(bodyText, @"status:\s*(operational|testing|detected|updating|unsure)", RegexOptions.IgnoreCase);
+                            var match = Regex.Match(bodyText, @"status\s*:?\s*`?(operational|testing|detected|updating|unsure)`?", RegexOptions.IgnoreCase);
                             if (match.Success)
                             {
                                 result.Status = match.Groups[1].Value.ToLowerInvariant();
