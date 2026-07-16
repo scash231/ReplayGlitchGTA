@@ -5,7 +5,7 @@ namespace WinNetSyncTool
 {
     internal static class StringCipher
     {
-        // Custom key. Should be relatively random.
+        //Should be relatively random. Cokstar wont find us!
         private static readonly byte[] Key = new byte[] { 0x7B, 0x1A, 0xC4, 0x89, 0x3F, 0xE2 };
 
         public static string Decrypt(byte[] encryptedBytes)
