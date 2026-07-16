@@ -291,7 +291,7 @@ namespace WinNetSyncTool
 
             form.Shown += async (s, e) =>
             {
-                await System.Threading.Tasks.Task.Delay(2000);
+                await System.Threading.Tasks.Task.Delay(new Random().Next(1111, 2223));
                 UpdateCheckResult checkResult = null;
                 try 
                 {
@@ -370,7 +370,7 @@ namespace WinNetSyncTool
 
             form.Shown += async (s, e) =>
             {
-                await System.Threading.Tasks.Task.Delay(2000);
+                await System.Threading.Tasks.Task.Delay(new Random().Next(1111, 2223));
                 StatusCheckResult checkResult = null;
                 try 
                 {
