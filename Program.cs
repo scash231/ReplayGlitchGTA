@@ -96,6 +96,31 @@ namespace GTAFirewallToggle
 
             System.Windows.Forms.Application.EnableVisualStyles();
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            
+            // Fire-and-forget background update check on startup
+            System.Threading.Tasks.Task.Run(async () => 
+            {
+                var result = await UpdateChecker.CheckForUpdatesAsync();
+                if (result.HasUpdate) 
+                {
+                    var dlgResult = System.Windows.Forms.MessageBox.Show(
+                        "A new update is available on GitHub! Your current version is outdated.\nWould you like to download the update now?", 
+                        "Update Available", 
+                        System.Windows.Forms.MessageBoxButtons.YesNo, 
+                        System.Windows.Forms.MessageBoxIcon.Information);
+
+                    if (dlgResult == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "https://github.com/scash231/ReplayGlitchGTA/releases/latest",
+                            UseShellExecute = true
+                        });
+                        Environment.Exit(0);
+                    }
+                }
+            });
+
             System.Windows.Forms.Application.Run(new OverlayForm());
         }
 
@@ -141,6 +166,48 @@ namespace GTAFirewallToggle
             catch { }
         }
 
+        public static void ShowWarningVbs()
+        {
+            var form = new System.Windows.Forms.Form()
+            {
+                Text = "WARNING",
+                Size = new System.Drawing.Size(440, 260),
+                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                TopMost = true,
+                ShowInTaskbar = false
+            };
+
+            var label = new System.Windows.Forms.Label()
+            {
+                Text = "Warning: For heists with preps it's recommended to only use the replay glitch once per day.\nDoing it more often could lead to errors or unwanted losing of preps for the heist.",
+                Dock = System.Windows.Forms.DockStyle.Top,
+                Height = 110,
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Padding = new System.Windows.Forms.Padding(10),
+                Font = new System.Drawing.Font("Segoe UI", 9.5f)
+            };
+
+            var button = new System.Windows.Forms.Button()
+            {
+                Text = "Understood",
+                DialogResult = System.Windows.Forms.DialogResult.OK,
+                Width = 115,
+                Height = 45,
+                Top = 125,
+                Left = 140,
+                Font = new System.Drawing.Font("Segoe UI", 10f, System.Drawing.FontStyle.Bold)
+            };
+
+            form.Controls.Add(label);
+            form.Controls.Add(button);
+            form.AcceptButton = button;
+
+            form.ShowDialog();
+        }
+
         public static void ShowInfoPopup()
         {
             var form = new System.Windows.Forms.Form()
@@ -167,7 +234,7 @@ namespace GTAFirewallToggle
 
             var button = new System.Windows.Forms.Button()
             {
-                Text = "yalla",
+                Text = "Proceed",
                 DialogResult = System.Windows.Forms.DialogResult.OK,
                 Width = 115,
                 Height = 45,
@@ -179,6 +246,83 @@ namespace GTAFirewallToggle
             form.Controls.Add(label);
             form.Controls.Add(button);
             form.AcceptButton = button;
+
+            form.ShowDialog();
+        }
+        public static void ShowUpdateLoadingWindow()
+        {
+            var form = new System.Windows.Forms.Form()
+            {
+                Text = "Checking for updates",
+                Size = new System.Drawing.Size(300, 100),
+                StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                TopMost = true,
+                ShowInTaskbar = false
+            };
+
+            var progressBar = new System.Windows.Forms.ProgressBar()
+            {
+                Style = System.Windows.Forms.ProgressBarStyle.Marquee,
+                MarqueeAnimationSpeed = 30,
+                Dock = System.Windows.Forms.DockStyle.Fill,
+                Height = 30
+            };
+
+            var panel = new System.Windows.Forms.Panel()
+            {
+                Padding = new System.Windows.Forms.Padding(20),
+                Dock = System.Windows.Forms.DockStyle.Fill
+            };
+            panel.Controls.Add(progressBar);
+            form.Controls.Add(panel);
+
+            form.Shown += async (s, e) =>
+            {
+                UpdateCheckResult checkResult = null;
+                try 
+                {
+                    checkResult = await System.Threading.Tasks.Task.Run(() => UpdateChecker.CheckForUpdatesAsync());
+                } 
+                catch (Exception ex)
+                {
+                    checkResult = new UpdateCheckResult { HasError = true, ErrorMessage = "Unexpected error: " + ex.Message };
+                }
+
+                form.Close();
+
+                if (checkResult != null)
+                {
+                    if (checkResult.HasError)
+                    {
+                        System.Windows.Forms.MessageBox.Show(checkResult.ErrorMessage, "Update Check Failed", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                    }
+                    else if (checkResult.HasUpdate)
+                    {
+                        var result = System.Windows.Forms.MessageBox.Show(
+                            "A new update is available on GitHub! Your current version is outdated.\nWould you like to download the update now?", 
+                            "Update Available", 
+                            System.Windows.Forms.MessageBoxButtons.YesNo, 
+                            System.Windows.Forms.MessageBoxIcon.Information);
+
+                        if (result == System.Windows.Forms.DialogResult.Yes)
+                        {
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = "https://github.com/scash231/ReplayGlitchGTA/releases/latest",
+                                UseShellExecute = true
+                            });
+                            Environment.Exit(0);
+                        }
+                    }
+                    else if (checkResult.IsUpToDate)
+                    {
+                        System.Windows.Forms.MessageBox.Show("You are using the latest version!", "Up to date", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                    }
+                }
+            };
 
             form.ShowDialog();
         }
@@ -264,6 +408,8 @@ namespace GTAFirewallToggle
             var contextMenu = new System.Windows.Forms.ContextMenuStrip();
             contextMenu.Items.Add("Exit", null, (s, ev) => System.Windows.Forms.Application.Exit());
             contextMenu.Items.Add("Info", null, (s, ev) => Program.ShowInfoPopup());
+            contextMenu.Items.Add("Warning", null, (s, ev) => Program.ShowWarningVbs());
+            contextMenu.Items.Add("Check for update", null, (s, ev) => Program.ShowUpdateLoadingWindow());
 
             _trayIcon = new System.Windows.Forms.NotifyIcon()
             {
@@ -288,6 +434,7 @@ namespace GTAFirewallToggle
             // Show popup asynchronously on the main UI thread after the form is fully loaded
             this.BeginInvoke(new System.Action(() => 
             {
+                Program.ShowWarningVbs();
                 Program.ShowInfoPopup();
             }));
         }
