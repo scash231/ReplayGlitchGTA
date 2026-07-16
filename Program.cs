@@ -395,6 +395,10 @@ namespace WinNetSyncTool
                         {
                             System.Windows.Forms.MessageBox.Show("Status is Operational. Everything looks safe!", "Advisory Status", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
                         }
+                        else if (checkResult.Status == "detected")
+                        {
+                            System.Windows.Forms.MessageBox.Show("Warning current Status Detected!\n\nDo not use until further notice.", "CRITICAL WARNING", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        }
                         else
                         {
                             string msg = $"Current Status Warning: {char.ToUpper(checkResult.Status[0]) + checkResult.Status.Substring(1)}\n\nPlease proceed with caution or check the latest community reports.";

@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>WinNetSyncTool</AssemblyName>
     <RootNamespace>WinNetSyncTool</RootNamespace>
+    <PublishTrimmed>true</PublishTrimmed>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
 
   </PropertyGroup>
 
