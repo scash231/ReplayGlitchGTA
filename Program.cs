@@ -348,7 +348,7 @@ namespace WinNetSyncTool
             var form = new System.Windows.Forms.Form()
             {
                 Text = "Info",
-                Size = new System.Drawing.Size(460, 310),
+                Size = new System.Drawing.Size(480, 420),
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen,
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
@@ -361,7 +361,7 @@ namespace WinNetSyncTool
             {
                 Text = "How it works (Proceed with caution!):\n\n1. Play heist normally.\n2. Near the end, press Ctrl + F9 to block IP.\n3. Watch/skip ending cutscene, wait for 'Save Failed' or wait 5 seconds.\n4. Once in control, go to Story Mode.\n5. Press Ctrl + F12 to unblock IP.\n6. Go back to Online Mode.\n7. CRUCIAL: Do not check the heist board! Force save (swap outfit or Alt+F4 -> No(esc)).\n8. Load Story Mode, then back to Online Mode.\n9. Ready for next replay after 10 minutes if the heist was 2 players, or 5 mins if the heist was 4 players (less players = more time inbetween).",
                 Dock = System.Windows.Forms.DockStyle.Top,
-                Height = 160,
+                Height = 280,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
                 Padding = new System.Windows.Forms.Padding(10),
                 Font = new System.Drawing.Font("Segoe UI", 9.5f)
@@ -373,8 +373,8 @@ namespace WinNetSyncTool
                 DialogResult = System.Windows.Forms.DialogResult.OK,
                 Width = 115,
                 Height = 45,
-                Top = 175,
-                Left = 150,
+                Top = 310,
+                Left = 175,
                 Font = new System.Drawing.Font("Segoe UI", 10f, System.Drawing.FontStyle.Bold)
             };
 
